@@ -1,0 +1,14 @@
+:root{
+  --bg:#0b1220;
+  --panel:#111827;
+  --accent:#1f6feb;
+}
+html,body{height:100%;margin:0;font-family:Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif;background:var(--bg);color:#fff}
+main{max-width:900px;margin:24px auto;padding:16px}
+h1{text-align:center;margin:0 0 12px}
+.game-area{display:flex;gap:16px;align-items:start;justify-content:center}
+canvas{background:#0f1724;border:4px solid #111;border-radius:6px;image-rendering:pixelated}
+.info{min-width:160px;padding:12px;background:rgba(255,255,255,0.03);border-radius:6px}
+.info div{margin-bottom:8px}
+.controls ul{padding-left:18px;margin:4px 0}
+.note{text-align:center;opacity:0.8}

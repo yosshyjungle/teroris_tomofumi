@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>シンプルテトリス</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main>
+      <h1>シンプルテトリス</h1>
+      <div class="game-area">
+        <canvas id="board" width="240" height="480"></canvas>
+        <aside class="info">
+          <div>Score: <span id="score">0</span></div>
+          <div>Level: <span id="level">1</span></div>
+          <div class="controls">
+            <p>操作方法</p>
+            <ul>
+              <li>← / → : 移動</li>
+              <li>↑ : 回転</li>
+              <li>↓ : 早く落とす</li>
+              <li>Space : 即落下</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+      <p class="note">純粋なJavaScriptで実装。小学生向けの簡易版です。</p>
+    </main>
+    <script src="main.js"></script>
+  </body>
+</html>
