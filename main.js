@@ -1,56 +1,136 @@
-// シンプルテトリス（純粋なJavaScript）
+// スマホ向けテトリス（純粋なJavaScript）
 (function(){
   const canvas = document.getElementById('board');
   const ctx = canvas.getContext('2d');
   const scoreEl = document.getElementById('score');
   const levelEl = document.getElementById('level');
 
+  // スマホ向けにサイズを調整
   const COLS = 10;
   const ROWS = 20;
-  const BLOCK = 24; // px
+  const BLOCK = Math.min(20, Math.floor(window.innerWidth * 0.8 / COLS)); // レスポンシブサイズ
   const WIDTH = COLS * BLOCK;
   const HEIGHT = ROWS * BLOCK;
 
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
+  
+  // キャンバスを中央に配置
+  canvas.style.display = 'block';
+  canvas.style.margin = '0 auto';
 
-  // テトロミノ定義（4x4 マトリクスの初期形）
+  // テトロミノ定義（各形状の全回転パターンを含む）
   const TETROMINOES = {
-    I: [[
-      [0,0,0,0],
-      [1,1,1,1],
-      [0,0,0,0],
-      [0,0,0,0]
-    ]],
-    J: [[
-      [1,0,0],
-      [1,1,1],
-      [0,0,0]
-    ]],
-    L: [[
-      [0,0,1],
-      [1,1,1],
-      [0,0,0]
-    ]],
-    O: [[
-      [1,1],
-      [1,1]
-    ]],
-    S: [[
-      [0,1,1],
-      [1,1,0],
-      [0,0,0]
-    ]],
-    T: [[
-      [0,1,0],
-      [1,1,1],
-      [0,0,0]
-    ]],
-    Z: [[
-      [1,1,0],
-      [0,1,1],
-      [0,0,0]
-    ]]
+    I: [
+      [
+        [0,0,0,0],
+        [1,1,1,1],
+        [0,0,0,0],
+        [0,0,0,0]
+      ],
+      [
+        [0,0,1,0],
+        [0,0,1,0],
+        [0,0,1,0],
+        [0,0,1,0]
+      ]
+    ],
+    J: [
+      [
+        [1,0,0],
+        [1,1,1],
+        [0,0,0]
+      ],
+      [
+        [0,1,1],
+        [0,1,0],
+        [0,1,0]
+      ],
+      [
+        [0,0,0],
+        [1,1,1],
+        [0,0,1]
+      ],
+      [
+        [0,1,0],
+        [0,1,0],
+        [1,1,0]
+      ]
+    ],
+    L: [
+      [
+        [0,0,1],
+        [1,1,1],
+        [0,0,0]
+      ],
+      [
+        [0,1,0],
+        [0,1,0],
+        [0,1,1]
+      ],
+      [
+        [0,0,0],
+        [1,1,1],
+        [1,0,0]
+      ],
+      [
+        [1,1,0],
+        [0,1,0],
+        [0,1,0]
+      ]
+    ],
+    O: [
+      [
+        [1,1],
+        [1,1]
+      ]
+    ],
+    S: [
+      [
+        [0,1,1],
+        [1,1,0],
+        [0,0,0]
+      ],
+      [
+        [0,1,0],
+        [0,1,1],
+        [0,0,1]
+      ]
+    ],
+    T: [
+      [
+        [0,1,0],
+        [1,1,1],
+        [0,0,0]
+      ],
+      [
+        [0,1,0],
+        [0,1,1],
+        [0,1,0]
+      ],
+      [
+        [0,0,0],
+        [1,1,1],
+        [0,1,0]
+      ],
+      [
+        [0,1,0],
+        [1,1,0],
+        [0,1,0]
+      ]
+    ],
+    Z: [
+      [
+        [1,1,0],
+        [0,1,1],
+        [0,0,0]
+      ],
+      [
+        [0,0,1],
+        [0,1,1],
+        [0,1,0]
+      ]
+    ]
   };
 
   const COLORS = {
@@ -73,38 +153,22 @@
     const keys = Object.keys(TETROMINOES);
     const k = keys[Math.floor(Math.random()*keys.length)];
     const matrix = cloneMatrix(TETROMINOES[k][0]);
-    return {matrix, type:k, x:Math.floor((COLS - matrix[0].length)/2), y: -1};
+    return {matrix, type:k, rotation: 0, x:Math.floor((COLS - matrix[0].length)/2), y: -1};
   }
 
   function cloneMatrix(m){
     return m.map(r => r.slice());
   }
 
-  // 回転（右回転）
-  function rotate(matrix){
-    const N = matrix.length;
-    const res = [];
-    for(let x=0;x<N;x++){
-      res[x]=[];
-      for(let y=0;y<N;y++){
-        res[x][y]=matrix[N-1-y][x] || 0;
-      }
-    }
-    // trim empty rows/cols for non-4x4 shapes
-    return trimMatrix(res);
-  }
-
-  function trimMatrix(m){
-    // remove empty top rows
-    while(m.length && m[0].every(v=>v===0)) m.shift();
-    // remove empty bottom rows
-    while(m.length && m[m.length-1].every(v=>v===0)) m.pop();
-    // remove empty left/right cols
-    if(m.length===0) return [[0]];
-    let left=0,right=m[0].length-1;
-    while(m.every(row=>row[left]===0)) left++;
-    while(m.every(row=>row[right]===0)) right--;
-    return m.map(r=>r.slice(left,right+1));
+  // 回転（次の回転パターンに変更）
+  function rotatePiece(piece){
+    const tetromino = TETROMINOES[piece.type];
+    const nextRotation = (piece.rotation + 1) % tetromino.length;
+    return {
+      ...piece,
+      matrix: cloneMatrix(tetromino[nextRotation]),
+      rotation: nextRotation
+    };
   }
 
   function collide(board, piece){
@@ -221,7 +285,7 @@
       // ゲームオーバー
       gameOver = true;
       clearInterval(dropTimer);
-      alert('Game Over! Score: ' + score);
+      alert('ゲームオーバー！スコア: ' + score);
     }
   }
 
@@ -238,42 +302,101 @@
     draw();
   }
 
-  // 操作
-  document.addEventListener('keydown', e=>{
+  // 操作関数
+  function moveLeft(){
     if(gameOver) return;
-    if(e.key === 'ArrowLeft'){
-      player.x--;
-      if(collide(board, player)) player.x++;
-      draw();
-    } else if(e.key === 'ArrowRight'){
-      player.x++;
-      if(collide(board, player)) player.x--;
-      draw();
-    } else if(e.key === 'ArrowUp'){
-      const old = player.matrix;
-      player.matrix = rotate(player.matrix);
-      // wall kick simple
-      let kick = 0;
-      while(collide(board, player) && kick < 3){
-        player.x += (kick%2===0) ? 1 : -1;
-        kick++;
-      }
-      if(collide(board, player)) player.matrix = old;
-      draw();
-    } else if(e.key === 'ArrowDown'){
-      // soft drop (one step)
-      drop();
-    } else if(e.code === 'Space'){
-      // hard drop
-      while(!collide(board, player)) player.y++;
-      player.y--;
-      merge(board, player);
-      const lines = clearLines();
-      updateScore(lines);
-      spawn();
-      draw();
+    player.x--;
+    if(collide(board, player)) player.x++;
+    draw();
+  }
+
+  function moveRight(){
+    if(gameOver) return;
+    player.x++;
+    if(collide(board, player)) player.x--;
+    draw();
+  }
+
+  function rotateBlock(){
+    if(gameOver) return;
+    const rotated = rotatePiece(player);
+    const oldMatrix = player.matrix;
+    const oldRotation = player.rotation;
+    
+    player.matrix = rotated.matrix;
+    player.rotation = rotated.rotation;
+    
+    // 壁キック（簡単版）
+    let kick = 0;
+    while(collide(board, player) && kick < 3){
+      player.x += (kick%2===0) ? 1 : -1;
+      kick++;
+    }
+    
+    if(collide(board, player)){
+      player.matrix = oldMatrix;
+      player.rotation = oldRotation;
+    }
+    draw();
+  }
+
+  function softDrop(){
+    if(gameOver) return;
+    drop();
+  }
+
+  function hardDrop(){
+    if(gameOver) return;
+    while(!collide(board, player)) player.y++;
+    player.y--;
+    merge(board, player);
+    const lines = clearLines();
+    updateScore(lines);
+    spawn();
+    draw();
+  }
+
+  // キーボード操作
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'ArrowLeft') moveLeft();
+    else if(e.key === 'ArrowRight') moveRight();
+    else if(e.key === 'ArrowUp') rotateBlock();
+    else if(e.key === 'ArrowDown') softDrop();
+    else if(e.code === 'Space') hardDrop();
+  });
+
+  // タッチ操作とボタンイベント
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  });
+
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    
+    if(Math.abs(deltaX) > Math.abs(deltaY)){
+      if(deltaX > 30) moveRight();
+      else if(deltaX < -30) moveLeft();
+    } else {
+      if(deltaY > 30) softDrop();
+      else if(deltaY < -30) rotateBlock();
     }
   });
+
+  // ボタンイベント
+  document.getElementById('leftBtn')?.addEventListener('click', moveLeft);
+  document.getElementById('rightBtn')?.addEventListener('click', moveRight);
+  document.getElementById('rotateBtn')?.addEventListener('click', rotateBlock);
+  document.getElementById('downBtn')?.addEventListener('click', softDrop);
+  document.getElementById('dropBtn')?.addEventListener('click', hardDrop);
 
   // 初期描画
   draw();

@@ -2,30 +2,51 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>シンプルテトリス</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>スマホテトリス</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <main>
-      <h1>シンプルテトリス</h1>
-      <div class="game-area">
-        <canvas id="board" width="240" height="480"></canvas>
-        <aside class="info">
-          <div>Score: <span id="score">0</span></div>
-          <div>Level: <span id="level">1</span></div>
-          <div class="controls">
-            <p>操作方法</p>
-            <ul>
-              <li>← / → : 移動</li>
-              <li>↑ : 回転</li>
-              <li>↓ : 早く落とす</li>
-              <li>Space : 即落下</li>
-            </ul>
-          </div>
-        </aside>
+      <h1>スマホテトリス</h1>
+      <div class="score-area">
+        <div class="score-item">スコア: <span id="score">0</span></div>
+        <div class="score-item">レベル: <span id="level">1</span></div>
       </div>
-      <p class="note">純粋なJavaScriptで実装。小学生向けの簡易版です。</p>
+      <div class="game-area">
+        <canvas id="board"></canvas>
+      </div>
+      
+      <!-- モバイル操作用ボタン -->
+      <div class="mobile-controls">
+        <div class="control-row">
+          <button id="leftBtn" class="control-btn">←</button>
+          <button id="rotateBtn" class="control-btn rotate-btn">回転</button>
+          <button id="rightBtn" class="control-btn">→</button>
+        </div>
+        <div class="control-row">
+          <button id="downBtn" class="control-btn">↓</button>
+          <button id="dropBtn" class="control-btn drop-btn">即落下</button>
+        </div>
+      </div>
+      
+      <div class="instructions">
+        <h3>操作方法</h3>
+        <div class="instruction-grid">
+          <div class="instruction-item">
+            <strong>タッチ操作:</strong><br>
+            スワイプで移動・回転
+          </div>
+          <div class="instruction-item">
+            <strong>ボタン操作:</strong><br>
+            画面下のボタンを使用
+          </div>
+          <div class="instruction-item">
+            <strong>キーボード:</strong><br>
+            矢印キー + Space
+          </div>
+        </div>
+      </div>
     </main>
     <script src="main.js"></script>
   </body>

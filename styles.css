@@ -2,13 +2,204 @@
   --bg:#0b1220;
   --panel:#111827;
   --accent:#1f6feb;
+  --button-bg:#2d3748;
+  --button-hover:#4a5568;
+  --button-active:#1a202c;
 }
-html,body{height:100%;margin:0;font-family:Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif;background:var(--bg);color:#fff}
-main{max-width:900px;margin:24px auto;padding:16px}
-h1{text-align:center;margin:0 0 12px}
-.game-area{display:flex;gap:16px;align-items:start;justify-content:center}
-canvas{background:#0f1724;border:4px solid #111;border-radius:6px;image-rendering:pixelated}
-.info{min-width:160px;padding:12px;background:rgba(255,255,255,0.03);border-radius:6px}
-.info div{margin-bottom:8px}
-.controls ul{padding-left:18px;margin:4px 0}
-.note{text-align:center;opacity:0.8}
+
+* {
+  box-sizing: border-box;
+}
+
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Segoe UI, Hiragino Kaku Gothic ProN, Meiryo, sans-serif;
+  background:var(--bg);
+  color:#fff;
+  overflow-x: hidden;
+}
+
+main{
+  max-width:100%;
+  margin:0;
+  padding:8px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+h1{
+  text-align:center;
+  margin:8px 0;
+  font-size:1.5rem;
+}
+
+.score-area{
+  display:flex;
+  justify-content:space-around;
+  margin:8px 0;
+  padding:8px;
+  background:rgba(255,255,255,0.05);
+  border-radius:8px;
+}
+
+.score-item{
+  font-size:1.1rem;
+  font-weight:bold;
+}
+
+.game-area{
+  display:flex;
+  justify-content:center;
+  margin:8px 0;
+}
+
+canvas{
+  background:#0f1724;
+  border:2px solid #333;
+  border-radius:8px;
+  image-rendering:pixelated;
+  max-width:100%;
+  height:auto;
+}
+
+.mobile-controls{
+  margin:16px 0;
+  padding:0 8px;
+}
+
+.control-row{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin:8px 0;
+}
+
+.control-btn{
+  background:var(--button-bg);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:12px 16px;
+  font-size:1.2rem;
+  font-weight:bold;
+  cursor:pointer;
+  user-select:none;
+  touch-action:manipulation;
+  min-width:60px;
+  transition:all 0.1s ease;
+}
+
+.control-btn:active{
+  background:var(--button-active);
+  transform:scale(0.95);
+}
+
+.rotate-btn{
+  background:#4a90e2;
+  min-width:80px;
+}
+
+.drop-btn{
+  background:#e74c3c;
+  min-width:100px;
+}
+
+.instructions{
+  margin:16px 0;
+  padding:12px;
+  background:rgba(255,255,255,0.03);
+  border-radius:8px;
+}
+
+.instructions h3{
+  margin:0 0 12px;
+  text-align:center;
+  font-size:1.1rem;
+}
+
+.instruction-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+
+.instruction-item{
+  padding:8px;
+  background:rgba(255,255,255,0.05);
+  border-radius:6px;
+  font-size:0.9rem;
+  line-height:1.4;
+}
+
+/* デスクトップ向けの調整 */
+@media (min-width: 768px) {
+  main{
+    max-width:900px;
+    margin:24px auto;
+    padding:16px;
+  }
+  
+  h1{
+    font-size:2rem;
+    margin:0 0 16px;
+  }
+  
+  .game-area{
+    display:flex;
+    gap:16px;
+    align-items:start;
+    justify-content:center;
+  }
+  
+  .score-area{
+    display:none;
+  }
+  
+  .mobile-controls{
+    display:none;
+  }
+  
+  .instructions{
+    display:none;
+  }
+  
+  canvas{
+    border:4px solid #111;
+    border-radius:6px;
+  }
+  
+  /* デスクトップ用のサイドバー */
+  .game-area::after{
+    content:"";
+    display:block;
+    min-width:160px;
+    padding:12px;
+    background:rgba(255,255,255,0.03);
+    border-radius:6px;
+    margin-left:16px;
+  }
+  
+  .game-area::after{
+    content:"スコア: " attr(data-score) " レベル: " attr(data-level);
+    white-space:pre-line;
+  }
+}
+
+/* タッチデバイス向けの最適化 */
+@media (hover: none) and (pointer: coarse) {
+  .control-btn{
+    padding:16px 20px;
+    font-size:1.4rem;
+    min-width:70px;
+  }
+  
+  .rotate-btn{
+    min-width:90px;
+  }
+  
+  .drop-btn{
+    min-width:110px;
+  }
+}
